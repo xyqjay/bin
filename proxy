@@ -1,0 +1,80 @@
+
+R='\033[0;31m'   #'0;31' is Red's ANSI color code
+G='\033[0;32m'   #'0;32' is Green's ANSI color code
+Y='\033[1;32m'   #'1;32' is Yellow's ANSI color code
+B='\033[0;34m'   #'0;34' is Blue's ANSI color code
+NOCOLOR='\033[0m'
+
+print_current_env() {
+    echo "$G Your Current $Y HTTP Proxy $G ENVs: $NOCOLOR"
+    echo "http_proxy=$http_proxy https_proxy=$https_proxy all_proxy=$all_proxy"
+    echo "HTTP_PROXY=$HTTP_PROXY HTTPS_PROXY=$HTTPS_PROXY ALL_PROXY=$ALL_PROXY"
+    echo "$G Your Current $Y Git Proxy $G ENVs:$NOCOLOR"
+
+    result=$(git config --global -l | grep proxy)
+    echo $result
+    echo ""
+}
+
+print_current_env
+
+set_proxy() {
+    echo "Enter Port:"
+    read port
+    echo "You entered:$port"
+    echo "$G Set Proxy: http://127.0.0.1:$port $NOCOLOR"
+    export https_proxy="http://127.0.0.1:$port"
+    export http_proxy="http://127.0.0.1:$port"
+    export all_proxy="socks5://127.0.0.1:$port"
+    # echo $https_proxy
+}
+
+unset_proxy() {
+    unset http_proxy
+    unset https_proxy
+    unset all_proxy
+    unset HTTP_PROXY
+    unset HTTPS_PROXY
+    unset ALL_PROXY
+    echo $https_proxy
+    echo "$G Unset Proxy Successfully, Bye!😈$NOCOLOR"
+}
+
+git_set_proxy() {
+    echo "Enter Port:"
+    read port
+    echo "You entered:$port"
+    echo "$G Set Git Config Global Proxy: http://127.0.0.1:$port $NOCOLOR"
+    git config --global http.proxy "http://127.0.0.1:$port"
+    git config --global https.proxy "http://127.0.0.1:$port"
+}
+
+git_unset_proxy() {
+    git config --global --unset https.proxy
+    git config --global --unset http.proxy
+    echo "$G Unset Git Proxy Successfully, Bye!😈$NOCOLOR"
+}
+
+PS3="Select your option please: "
+select lng in Proxy UnSet GitProxy GitUnSet Quit
+do
+    case $lng in
+        "Proxy")
+            set_proxy
+            break;;
+        "UnSet")
+            unset_proxy
+           break;;
+        "GitProxy")
+            git_set_proxy
+           break;;
+        "GitUnSet")
+            git_unset_proxy
+           break;;
+        "Quit")
+            echo "$G Quit, Bye!$NOCOLOR"
+           break;;
+        *)
+           echo "$R Ooops!!! Please Select a valid option$NOCOLOR";;
+    esac
+done
